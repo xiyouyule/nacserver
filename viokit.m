@@ -7,26 +7,49 @@
 #define FAKE_BOARD_ID "Mac-F221BEC8"
 #define FAKE_SERIAL "CK1350NCEUH"
 #define FAKE_HW_UUID "ABB178CD-25C5-5AFB-A749-B432FD683AE1"
-//#define FAKE_SYS_UUID "ADEAE"
-#define FAKE_ROM 0xb48b1988b880
+// #define FAKE_SYS_UUID "ADEAE"
+const uint64_t FAKE_ROM = 0xb48b1988b880;
 #define FAKE_BOARD_SERIAL "CK1350351BH8U"
 
-//#define FAKE_G_DATA [0x1663a52f1d827299e41d56d74223ecca60]
-//const uint8_t[] FAKE_G_DATA = uint8_t[0x16, 0x63, 0xa5, 0x2f, 0x1d, 0x82, 0x72, 0x99, 0xe4, 0x1d, 0x56, 0xd7, 0x42, 0x23, 0xec, 0xca, 0x60]
-const uint8_t FAKE_G_DATA[] = {0x16, 0x63, 0xa5, 0x2f, 0x1d, 0x82, 0x72, 0x99, 0xe4, 0x1d, 0x56, 0xd7, 0x42, 0x23, 0xec, 0xca, 0x60};
-//const uint8_t[] fake_g_data = FAKE_G_DATA;
-//#define FAKE_F_DATA [0x95987adcec1a31eccd63a9ba21e182fadb]
-//#define FAKE_F_DATA [0x95, 0x98, 0x7a, 0xdc, 0xec, 0x1a, 0x31, 0xec, 0xcd, 0x63, 0xa9, 0xba, 0x21, 0xe1, 0x82, 0xfa, 0xdb]
-const uint8_t FAKE_F_DATA[] = {0x95, 0x98, 0x7a, 0xdc, 0xec, 0x1a, 0x31, 0xec, 0xcd, 0x63, 0xa9, 0xba, 0x21, 0xe1, 0x82, 0xfa, 0xdb};
-//#define FAKE_k_DATA [0x6e7092c5131ea9378f57e9d109ed010112]
-//#define FAKE_k_DATA [0x6e, 0x70, 0x92, 0xc5, 0x13, 0x1e, 0xa9, 0x37, 0x8f, 0x57, 0xe9, 0xd1, 0x09, 0xed, 0x01, 0x01, 0x12]
-const uint8_t FAKE_k_DATA[] = {0x6e, 0x70, 0x92, 0xc5, 0x13, 0x1e, 0xa9, 0x37, 0x8f, 0x57, 0xe9, 0xd1, 0x09, 0xed, 0x01, 0x01, 0x12};
-//#define FAKE_o_DATA [0x71dbaec99c49cef0a5addcb0e2be0b2f2d]
-//#define FAKE_o_DATA [0x71, 0xdb, 0xae, 0xc9, 0x9c, 0x49, 0xce, 0xf0, 0xa5, 0xad, 0xdc, 0xb0, 0xe2, 0xbe, 0x0b, 0x2f, 0x2d]
-const uint8_t FAKE_o_DATA[] = {0x71, 0xdb, 0xae, 0xc9, 0x9c, 0x49, 0xce, 0xf0, 0xa5, 0xad, 0xdc, 0xb0, 0xe2, 0xbe, 0x0b, 0x2f, 0x2d};
-//#define FAKE_a_DATA [0x9d94ed553d6d55a09074f667aa6b6cd155]
-//#define FAKE_a_DATA [0x9d, 0x94, 0xed, 0x55, 0x3d, 0x6d, 0x55, 0xa0, 0x90, 0x74, 0xf6, 0x67, 0xaa, 0x6b, 0x6c, 0xd1, 0x55]
-const uint8_t FAKE_a_DATA[] = {0x9d, 0x94, 0xed, 0x55, 0x3d, 0x6d, 0x55, 0xa0, 0x90, 0x74, 0xf6, 0x67, 0xaa, 0x6b, 0x6c, 0xd1, 0x55};
+// #define FAKE_G_DATA [0x1663a52f1d827299e41d56d74223ecca60]
+// const uint8_t[] FAKE_G_DATA = uint8_t[0x16, 0x63, 0xa5, 0x2f, 0x1d, 0x82,
+// 0x72, 0x99, 0xe4, 0x1d, 0x56, 0xd7, 0x42, 0x23, 0xec, 0xca, 0x60]
+//const uint8_t FAKE_G_DATA[] = {0x16, 0x63, 0xa5, 0x2f, 0x1d, 0x82,
+//                               0x72, 0x99, 0xe4, 0x1d, 0x56, 0xd7,
+//                               0x42, 0x23, 0xec, 0xca, 0x60};
+#define BA(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p) {0x##a,0x##b,0x##c,0x##d,\
+0x##e,0x##f,0x##g,0x##h,0x##i,0x##j,0x##k,0x##l,0x##m,0x##n,0x##o,0x##p}
+
+#define TO_BYTEARRAY(...) BA(__VA_ARGS__)
+
+const uint8_t FAKE_G_DATA[] = TO_BYTEARRAY();
+
+
+// const uint8_t[] fake_g_data = FAKE_G_DATA;
+// #define FAKE_F_DATA [0x95987adcec1a31eccd63a9ba21e182fadb]
+// #define FAKE_F_DATA [0x95, 0x98, 0x7a, 0xdc, 0xec, 0x1a, 0x31, 0xec, 0xcd,
+// 0x63, 0xa9, 0xba, 0x21, 0xe1, 0x82, 0xfa, 0xdb]
+const uint8_t FAKE_F_DATA[] = {0x95, 0x98, 0x7a, 0xdc, 0xec, 0x1a,
+                               0x31, 0xec, 0xcd, 0x63, 0xa9, 0xba,
+                               0x21, 0xe1, 0x82, 0xfa, 0xdb};
+// #define FAKE_k_DATA [0x6e7092c5131ea9378f57e9d109ed010112]
+// #define FAKE_k_DATA [0x6e, 0x70, 0x92, 0xc5, 0x13, 0x1e, 0xa9, 0x37, 0x8f,
+// 0x57, 0xe9, 0xd1, 0x09, 0xed, 0x01, 0x01, 0x12]
+const uint8_t FAKE_k_DATA[] = {0x6e, 0x70, 0x92, 0xc5, 0x13, 0x1e,
+                               0xa9, 0x37, 0x8f, 0x57, 0xe9, 0xd1,
+                               0x09, 0xed, 0x01, 0x01, 0x12};
+// #define FAKE_o_DATA [0x71dbaec99c49cef0a5addcb0e2be0b2f2d]
+// #define FAKE_o_DATA [0x71, 0xdb, 0xae, 0xc9, 0x9c, 0x49, 0xce, 0xf0, 0xa5,
+// 0xad, 0xdc, 0xb0, 0xe2, 0xbe, 0x0b, 0x2f, 0x2d]
+const uint8_t FAKE_o_DATA[] = {0x71, 0xdb, 0xae, 0xc9, 0x9c, 0x49,
+                               0xce, 0xf0, 0xa5, 0xad, 0xdc, 0xb0,
+                               0xe2, 0xbe, 0x0b, 0x2f, 0x2d};
+// #define FAKE_a_DATA [0x9d94ed553d6d55a09074f667aa6b6cd155]
+// #define FAKE_a_DATA [0x9d, 0x94, 0xed, 0x55, 0x3d, 0x6d, 0x55, 0xa0, 0x90,
+// 0x74, 0xf6, 0x67, 0xaa, 0x6b, 0x6c, 0xd1, 0x55]
+const uint8_t FAKE_a_DATA[] = {0x9d, 0x94, 0xed, 0x55, 0x3d, 0x6d,
+                               0x55, 0xa0, 0x90, 0x74, 0xf6, 0x67,
+                               0xaa, 0x6b, 0x6c, 0xd1, 0x55};
 
 // Helpers
 #define CFSTR_CMP(str1, str2) CFStringCompare(str1, str2, 0) == 0
@@ -86,13 +109,18 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
   } else if (CFSTR_CMP(key, CFSTR(k_DATA_NAME))) {
     // Create CFDataRef from FAKE_k_DATA
     return CFDataCreate(NULL, (const UInt8 *)&FAKE_k_DATA, sizeof(FAKE_k_DATA));
-  } /*else if (CFSTR_CMP(key, CFSTR(o_DATA_NAME))) {
-    // Create CFDataRef from FAKE_o_DATA
-    return CFDataCreate(NULL, (const UInt8 *)&FAKE_o_DATA, sizeof(FAKE_o_DATA));
-  } else if (CFSTR_CMP(key, CFSTR(a_DATA_NAME))) {
-    // Create CFDataRef from FAKE_a_DATA
-    return CFDataCreate(NULL, (const UInt8 *)&FAKE_a_DATA, sizeof(FAKE_a_DATA));
-  }*/ 
+  } else if (CFSTR_CMP(key, CFSTR("IOMACAddress"))) {
+    // Create CFDataRef from FAKE_ROM, which is a uint64_t, but we only want the
+    // 6 least significant bytes
+    return CFDataCreate(NULL, (const UInt8 *)&FAKE_ROM + 2, 6);
+  }
+  /*else if (CFSTR_CMP(key, CFSTR(o_DATA_NAME))) {
+   // Create CFDataRef from FAKE_o_DATA
+   return CFDataCreate(NULL, (const UInt8 *)&FAKE_o_DATA, sizeof(FAKE_o_DATA));
+ } else if (CFSTR_CMP(key, CFSTR(a_DATA_NAME))) {
+   // Create CFDataRef from FAKE_a_DATA
+   return CFDataCreate(NULL, (const UInt8 *)&FAKE_a_DATA, sizeof(FAKE_a_DATA));
+ }*/
   else {
     // Return NULL
     return NULL;
@@ -100,9 +128,9 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
 }
 
 CFMutableDictionaryRef IOServiceMatching(const char *name) {
-  //printf("IOServiceMatching called with %s\n", name);
-  // return 0;
-  //  Turn name into CFString
+  // printf("IOServiceMatching called with %s\n", name);
+  //  return 0;
+  //   Turn name into CFString
   CFStringRef name_cf =
       CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
   // Create a CFMutableDictionaryRef
@@ -119,14 +147,14 @@ io_service_t IOServiceGetMatchingService(mach_port_t masterPort,
                                          CFDictionaryRef matching) {
   // Print the CFDictionary
   // CFShow(matching);
-  //printf("IOServiceGetMatchingService called with port: %d matching: \n",
-  //       masterPort);
-  //CFShow(matching);
+  // printf("IOServiceGetMatchingService called with port: %d matching: \n",
+  //      masterPort);
+  // CFShow(matching);
 
   // Get the IOProviderClass
   CFStringRef provider_class =
       CFDictionaryGetValue(matching, CFSTR("IOProviderClass"));
-  
+
   // Check if it is 'IOPlatformExpertDevice'
   if (CFSTR_CMP(provider_class, CFSTR("IOPlatformExpertDevice"))) {
     return 92;
@@ -134,8 +162,29 @@ io_service_t IOServiceGetMatchingService(mach_port_t masterPort,
   return 0;
 }
 
+bool ITER_93_SHOULD_RETURN_MAC = false;
+kern_return_t IOServiceGetMatchingServices(mach_port_t masterPort,
+                                           CFDictionaryRef matching,
+                                           io_iterator_t *existing) {
+  printf("IOServiceGetMatchingServices called with port: %d matching: \n",
+         masterPort);
+  CFShow(matching);
+  if (CFSTR_CMP(CFDictionaryGetValue(matching, CFSTR("IOProviderClass")),
+                CFSTR("IOEthernetInterface"))) {
+    // printf("IOServiceGetMatchingServices returning 0\n");
+    *existing = 93;
+    ITER_93_SHOULD_RETURN_MAC = true;
+    return 0;
+  }
+  return -1;
+}
+
 io_object_t IOIteratorNext(io_iterator_t iterator) {
   printf("IOIteratorNext\n");
+  if (iterator == 93 && ITER_93_SHOULD_RETURN_MAC) {
+    ITER_93_SHOULD_RETURN_MAC = false;
+    return 94;
+  }
   return 0;
 }
 
@@ -144,14 +193,12 @@ void IOObjectRelease(io_object_t object) { printf("IOObjectRelease\n"); }
 kern_return_t IORegistryEntryGetParentEntry(io_registry_entry_t entry,
                                             const io_name_t plane,
                                             io_registry_entry_t *parent) {
-  printf("IORegistryEntryGetParentEntry\n");
-  return 0;
-}
-
-kern_return_t IOServiceGetMatchingServices(mach_port_t masterPort,
-                                           CFDictionaryRef matching,
-                                           io_iterator_t *existing) {
-  printf("IOServiceGetMatchingServices\n");
+  printf("IORegistryEntryGetParentEntry called wiht entry: %d and plane: %s "
+         "and parent %p\n",
+         entry, plane, parent);
+  // Set parent to entry + 100
+  *parent = entry + 100;
+  // printf("IORegistryEntryGetParentEntry returning 0\n");
   return 0;
 }
 
