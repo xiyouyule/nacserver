@@ -27,8 +27,8 @@ for sym in lib.symbols:
             print("Stubbing", name)
             STUB_LIST.append(name)
         # # Special stubs for IOKit
-        # if sym.binding_info.library.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit":
-        #     print("IOKit stub", name, "=>", "V" + name)
+        if sym.binding_info.library.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit":
+            print("IOKit stub", name)
         #     sym.name = "_V" + name[1:] # So that our stubs don't conflict with the real symbols
         #     STUB_LIST.append(sym.name)
         
@@ -39,10 +39,10 @@ for cmd in lib.commands:
         if cmd.name in REMOVING:
             cmd.name = "STUB" + ("\0" * (len(cmd.name) - 4))
             cmd.compatibility_version = [0, 0, 0]
-        # # Special stubs for IOKit
-        # if cmd.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit":
-        #     cmd.name = "VIOKit" + ("\0" * (len(cmd.name) - 5))
-        #     cmd.compatibility_version = [0, 0, 0]
+        # Special stubs for IOKit
+        if cmd.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit":
+            cmd.name = "VIOKit" + ("\0" * (len(cmd.name) - 5))
+            cmd.compatibility_version = [0, 0, 0]
             
 
 with open("stubs.m", "w") as f:

@@ -1,12 +1,16 @@
 #import <dlfcn.h>
 #import <stdio.h>
 
+#import <CoreFoundation/CoreFoundation.h>
 #import <Foundation/Foundation.h>
+#import <IOKit/IOCFSerialize.h>
+#import <IOKit/IOKitLib.h>
 
 // #define APPLE_SERVICES_FRAMEWORK_PATH                                          \
 //   "/System/Library/PrivateFrameworks/IMDAppleServices.framework/Versions/A/"   \
 //   "IMDAppleServices"
-//#define APPLE_SERVICES_FRAMEWORK_PATH "/Users/testuser/sync/IMDAppleServices.stubbed"
+// #define APPLE_SERVICES_FRAMEWORK_PATH
+// "/Users/testuser/sync/IMDAppleServices.stubbed"
 #define APPLE_SERVICES_FRAMEWORK_PATH "IMDAppleServices.stubbed"
 
 // Requests the validation certificate chain from Apple
@@ -83,7 +87,7 @@ NSData *initialize_validation(NSData *request_bytes) {
     return nil;
   }
   // Print the plist
-  //printf("plist: %s\n", [[plist description] UTF8String]);
+  // printf("plist: %s\n", [[plist description] UTF8String]);
   return plist[@"session-info"];
 }
 
@@ -119,7 +123,7 @@ void setup() {
     printf("loaded framework\n");
   }
   if (!BASE) {
-    //printf("calculating base\n");
+    // printf("calculating base\n");
     BASE = calculate_base(HANDLE);
   }
 }
@@ -146,20 +150,45 @@ int NACSubmitResponse(void *validation_ctx, void *response_bytes,
   return nac_submit_response(validation_ctx, response_bytes, response_len);
 }
 
-int NACGenerateValidationData(void *validation_ctx, void* unknown_1, void* unknown_2, void **validation_data,
+int NACGenerateValidationData(void *validation_ctx, void *unknown_1,
+                              void *unknown_2, void **validation_data,
                               int *validation_data_len) {
 #define NACGENERATEVALIDATIONDATA_OFFSET 0xb1df0
   setup();
 
   printf("NACGenerateValidationData called\n");
-  int (*nac_generate_validation_data)(void *, void *, void* , void *, int *) =
+  int (*nac_generate_validation_data)(void *, void *, void *, void *, int *) =
       BASE + NACGENERATEVALIDATIONDATA_OFFSET;
-  return nac_generate_validation_data(validation_ctx, unknown_1, unknown_2, validation_data,
-                                      validation_data_len);
+  return nac_generate_validation_data(validation_ctx, unknown_1, unknown_2,
+                                      validation_data, validation_data_len);
 }
 
+#define DYLD_INTERPOSE(_replacement, _replacee)                                \
+  __attribute__((used)) static struct {                                        \
+    const void *replacement;                                                   \
+    const void *replacee;                                                      \
+  } _interpose_##_replacee __attribute__((section("__DATA,__interpose"))) = {  \
+      (const void *)(unsigned long)&_replacement,                              \
+      (const void *)(unsigned long)&_replacee};
+
+CFTypeRef IORegistryEntryCreateCFProperty_interpose(io_registry_entry_t entry,
+                                                    CFStringRef key,
+                                                    CFAllocatorRef allocator,
+                                                    IOOptionBits options) {
+  printf("IORegistryEntryCreateCFProperty_interpose called\n");
+  return NULL;
+}
+
+DYLD_INTERPOSE(IORegistryEntryCreateCFProperty_interpose, IORegistryEntryCreateCFProperty)
+
+
+
+// DYLD_INTERPOSE(_replacement, &IORegistryEntryCreateCFProperty)
 
 int main() {
+
+  // hello();
+  //CFTypeRef test = IORegistryEntryCreateCFProperty();
   int ret = NACInit(0, 0, 0, 0, 0);
   if (ret != -44023) {
     printf("got unexpected result from all-null test: %d\n", ret);
@@ -176,14 +205,14 @@ int main() {
     printf("got unexpected result from valid cert test: %d\n", ret);
   }
 
-  //printf("validation_ctx: %p\n", validation_ctx);
+  // printf("validation_ctx: %p\n", validation_ctx);
 
   NSData *request = [[NSData alloc] initWithBytes:request_bytes
                                            length:request_len];
-  //printf("request bytes %s\n", [[request description] UTF8String]);
+  // printf("request bytes %s\n", [[request description] UTF8String]);
 
   NSData *session_info = initialize_validation(request);
-  //printf("session_info bytes %s\n", [[session_info description] UTF8String]);
+  // printf("session_info bytes %s\n", [[session_info description] UTF8String]);
 
   // NSData *response = [@"hello" dataUsingEncoding:NSUTF8StringEncoding];
   ret = NACSubmitResponse(validation_ctx, (void *)[session_info bytes],
