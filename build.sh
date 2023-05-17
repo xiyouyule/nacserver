@@ -14,6 +14,6 @@ rm stubs.o
 # rm viokit.o
 
 # Compile test.m into an executable
-xcrun clang test.m -o test -framework Foundation -framework IOKit -arch x86_64
+xcrun clang demo.m -o demo -framework Foundation -framework IOKit -arch x86_64
 # Run the executable
-./test
+./demo
