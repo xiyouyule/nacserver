@@ -47,6 +47,10 @@ NSDictionary* extract_iokit_data() {
     NSData* f_data = (__bridge_transfer NSData*)IORegistryEntryCreateCFProperty(power_service, CFSTR("Fyp98tpgj"), kCFAllocatorDefault, 0);
     // get kbjfrfpoJU
     NSData* k_data = (__bridge_transfer NSData*)IORegistryEntryCreateCFProperty(power_service, CFSTR("kbjfrfpoJU"), kCFAllocatorDefault, 0);
+    // get oycqAZloTNDm
+    NSData* o_data = (__bridge_transfer NSData*)IORegistryEntryCreateCFProperty(power_service, CFSTR("oycqAZloTNDm"), kCFAllocatorDefault, 0);
+    // get abKPld1EcMni
+    NSData* a_data = (__bridge_transfer NSData*)IORegistryEntryCreateCFProperty(power_service, CFSTR("abKPld1EcMni"), kCFAllocatorDefault, 0);
     //printf("Hello\n");
     //NSLog(@"HI %@", data);
 
@@ -109,6 +113,8 @@ NSDictionary* extract_iokit_data() {
         @"Gq3489ugfi": g_data,
         @"Fyp98tpgj": f_data,
         @"kbjfrfpoJU": k_data,
+        @"oycqAZloTNDm": o_data,
+        @"abKPld1EcMni": a_data,
         @"IOMACAddress": mac_address,
         @"4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:ROM": rom,
         @"4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:MLB": mlb,
