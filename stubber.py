@@ -24,11 +24,15 @@ for sym in lib.symbols:
     name = sym.name[1:]
     if sym.binding_info:
         if sym.binding_info.library.name in REMOVING:
-            print("Stubbing", name)
+            #print("Stubbing", name)
             STUB_LIST.append(name)
         # # Special stubs for IOKit
         if sym.binding_info.library.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit":
-            print("IOKit stub", name)
+            #print("IOKit/DA stub", name)
+            pass
+        if sym.binding_info.library.name == "/System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration":
+            print("DA stub", name)
+            #STUB_LIST.append(name)
         #     sym.name = "_V" + name[1:] # So that our stubs don't conflict with the real symbols
         #     STUB_LIST.append(sym.name)
         
@@ -40,8 +44,10 @@ for cmd in lib.commands:
             cmd.name = "STUB" + ("\0" * (len(cmd.name) - 4))
             cmd.compatibility_version = [0, 0, 0]
         # Special stubs for IOKit
-        if cmd.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit":
-            cmd.name = "VIOKit" + ("\0" * (len(cmd.name) - 5))
+        if cmd.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit": #or cmd.name == "/System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration":
+        #if cmd.name == "/System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration":
+            print("IOKit/DA stub cmd", cmd.name)
+            cmd.name = "VIOKit" + ("\0" * (len(cmd.name) - 6))
             cmd.compatibility_version = [0, 0, 0]
             
 

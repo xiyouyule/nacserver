@@ -1,5 +1,6 @@
 #include <CoreFoundation/CoreFoundation.h>
 //#include <Foundation/Foundation.h>
+//#include <Foundation/Foundation.h>
 #include <IOKit/IOTypes.h>
 #include <stdio.h>
 // #include <Foundation/Foundation.h>
@@ -87,8 +88,11 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
   if ([data_plist objectForKey:key_ns]) {
     // Get the value
     id value = [data_plist objectForKey:key_ns];
+    //printf("value: %p\n", value);
+    NSLog(@"value: %@", value);
     // Check if it is a string
     if ([value isKindOfClass:[NSString class]]) {
+      printf("value is NSString\n");
       // Convert the NSString to a CFStringRef
       CFStringRef value_cf = (__bridge_retained CFStringRef)value;
       // Create a CFDataRef from the CFStringRef
@@ -98,6 +102,7 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
       // Return the CFDataRef
       return value_data;
     } else if ([value isKindOfClass:[NSNumber class]]) {
+      printf("value is NSNumber\n");
       // Convert the NSNumber to a CFNumberRef
       CFNumberRef value_cf = (__bridge_retained CFNumberRef)value;
       // Create a CFDataRef from the CFNumberRef
@@ -108,8 +113,11 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
       // Return the CFDataRef
       return value_data;
     } else if ([value isKindOfClass:[NSData class]]) {
+      printf("value is NSData\n");
       // Convert the NSData to a CFDataRef
       CFDataRef value_cf = (__bridge_retained CFDataRef)value;
+      // Make a copy of the CFDataRef so that we are not returning an ARC object
+      CFDataRef value_cf_copy = CFDataCreateCopy(NULL, value_cf);
       // Return the CFDataRef
       return value_cf;
     } else {
@@ -189,6 +197,7 @@ io_service_t IOServiceGetMatchingService(mach_port_t masterPort,
   if (CFSTR_CMP(provider_class, CFSTR("IOPlatformExpertDevice"))) {
     return 92;
   }
+  NSLog(@"IOServiceGetMatchingService returning 0");
   return 0;
 }
 
@@ -206,6 +215,7 @@ kern_return_t IOServiceGetMatchingServices(mach_port_t masterPort,
     ITER_93_SHOULD_RETURN_MAC = true;
     return 0;
   }
+  NSLog(@"IOServiceGetMatchingServices returning -1");
   return -1;
 }
 
@@ -223,7 +233,7 @@ void IOObjectRelease(io_object_t object) { printf("IOObjectRelease\n"); }
 kern_return_t IORegistryEntryGetParentEntry(io_registry_entry_t entry,
                                             const io_name_t plane,
                                             io_registry_entry_t *parent) {
-  printf("IORegistryEntryGetParentEntry called wiht entry: %d and plane: %s "
+  printf("IORegistryEntryGetParentEntry called with entry: %d and plane: %s "
          "and parent %p\n",
          entry, plane, parent);
   // Set parent to entry + 100
@@ -232,6 +242,63 @@ kern_return_t IORegistryEntryGetParentEntry(io_registry_entry_t entry,
   return 0;
 }
 
+// DISK ARBITRATION
+//#import <DiskArbitration/DiskArbitration.h>
+
+const CFStringRef kDADiskDescriptionVolumeUUIDKey = CFSTR("DADiskDescriptionVolumeUUIDKey");
+
+CFNumberRef DASessionCreate(void * alloc) {
+  printf("DASessionCreate called with alloc: %p\n", alloc);
+  // Create a CFNumberRef
+  // Create a CFNumberRef from 201
+  int value = 201;
+  CFNumberRef value_cf = CFNumberCreate(NULL, kCFNumberIntType, &value);
+  return value_cf;
+  //return 201;
+}
+
+CFNumberRef DADiskCreateFromBSDName(CFAllocatorRef allocator, int session, const char * name) {
+  printf("DADiskCreateFromBSDName called with allocator: %p session: %d name: %s\n", allocator, session, name);
+  //return 202;
+  int value = 202;
+  CFNumberRef value_cf = CFNumberCreate(NULL, kCFNumberIntType, &value);
+  return value_cf;
+}
+
+//DADiskCopyDescription(DADiskRef  _Nonnull disk)
+CFDictionaryRef DADiskCopyDescription( int disk ) {
+  printf("DADiskCopyDescription called with disk: %d\n", disk);
+  // Create a CFMutableDictionaryRef
+  CFMutableDictionaryRef dict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+  printf("dict: %p\n", dict);
+  // Add the UUID to the dictionary
+  // Load the UUID from data.plist
+  if (DATA_PLIST == nil) {
+    DATA_PLIST = read_data_plist();
+    if (!DATA_PLIST) {
+      printf("Failed to read data.plist\n");
+      return NULL;
+    }
+  }
+  NSDictionary* data_plist = DATA_PLIST;
+  printf("data_plist: %p\n", data_plist);
+  // Get root_disk_uuid
+  NSString* root_disk_uuid = [data_plist objectForKey:@"root_disk_uuid"];
+  // Convert the NSString to a CFStringRef
+  CFStringRef root_disk_uuid_cf = (__bridge_retained CFStringRef)root_disk_uuid;
+  // Convert it to a CFUUIDRef
+  CFUUIDRef root_disk_uuid_cfuuid = CFUUIDCreateFromString(NULL, root_disk_uuid_cf);
+  printf("root_disk_uuid_cf: %p\n", root_disk_uuid_cf);
+  // Add the UUID to the dictionary
+  CFDictionaryAddValue(dict, kDADiskDescriptionVolumeUUIDKey, root_disk_uuid_cfuuid);
+  printf("dict: %p\n", dict);
+  // Make a copy of the CFDictionaryRef so that we are not returning an ARC object
+  CFDictionaryRef dict_copy = CFDictionaryCreateCopy(NULL, dict);
+  printf("dict_copy: %p\n", dict_copy);
+  // Return the dictionary
+  return dict_copy;
+}
+//kDADiskDescriptionVolumeUUIDKey 
 // IOIteratorNext
 // IOObjectRelease
 // IORegistryEntryCreateCFProperty
