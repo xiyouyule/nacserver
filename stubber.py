@@ -1,5 +1,8 @@
 import lief
 
+STUB_IOKIT = True
+STUB_DSKARB = True
+
 lib = lief.parse("IMDAppleServices")
 
 REMOVING = [
@@ -44,8 +47,9 @@ for cmd in lib.commands:
             cmd.name = "STUB" + ("\0" * (len(cmd.name) - 4))
             cmd.compatibility_version = [0, 0, 0]
         # Special stubs for IOKit
-        if cmd.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit": #or cmd.name == "/System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration":
+        #if cmd.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit": #or cmd.name == "/System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration":
         #if cmd.name == "/System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration":
+        if (STUB_IOKIT and cmd.name == "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit") or (STUB_DSKARB and cmd.name == "/System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration"):
             print("IOKit/DA stub cmd", cmd.name)
             cmd.name = "VIOKit" + ("\0" * (len(cmd.name) - 6))
             cmd.compatibility_version = [0, 0, 0]

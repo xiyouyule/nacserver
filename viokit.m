@@ -96,11 +96,11 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
       // Convert the NSString to a CFStringRef
       CFStringRef value_cf = (__bridge_retained CFStringRef)value;
       // Create a CFDataRef from the CFStringRef
-      CFDataRef value_data = data_from_cfstr(value_cf);
+      //CFDataRef value_data = data_from_cfstr(value_cf);
       // Release the CFStringRef
-      CFRelease(value_cf);
+      //CFRelease(value_cf);
       // Return the CFDataRef
-      return value_data;
+      return value_cf;
     } else if ([value isKindOfClass:[NSNumber class]]) {
       printf("value is NSNumber\n");
       // Convert the NSNumber to a CFNumberRef
