@@ -40,9 +40,11 @@ NSData *request_cert() {
   //   printf("error: %s\n", [[error description] UTF8String]);
   //   return nil;
   // }
-  return [NSDictionary dictionaryWithContentsOfURL:[NSURL
-                         URLWithString:@"http://static.ess.apple.com/identity/"
-                                       @"validation/cert-1.0.plist"]][@"cert"];
+  // return [NSDictionary dictionaryWithContentsOfURL:[NSURL
+  //                        URLWithString:@"http://static.ess.apple.com/identity/"
+  //                                      @"validation/cert-1.0.plist"]][@"cert"];
+  // Return 00
+  return [NSData dataWithBytes:"00" length:2];
   //return plist[@"cert"];
 }
 
