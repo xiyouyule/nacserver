@@ -1,52 +1,18 @@
 #import <dlfcn.h>
 #import <stdio.h>
 
+#import "nac.m"
 #import <CoreFoundation/CoreFoundation.h>
 #import <Foundation/Foundation.h>
 #import <IOKit/IOCFSerialize.h>
 #import <IOKit/IOKitLib.h>
 
-#define APPLE_SERVICES_FRAMEWORK_PATH "IMDAppleServices.stubbed"
-
 // Requests the validation certificate chain from Apple
 NSData *request_cert() {
-  // Make a request to
-  // http://static.ess.apple.com/identity/validation/cert-1.0.plist
-  // NSMutableURLRequest *req = [NSMutableURLRequest
-  //     requestWithURL:[NSURL
-  //                        URLWithString:@"http://static.ess.apple.com/identity/"
-  //                                      @"validation/cert-1.0.plist"]];
-  // [req setHTTPMethod:@"GET"];
-
-  // NSURLResponse *response = nil;
-  // NSError *error = nil;
-  /*NSData *data = [NSURLConnection sendSynchronousRequest:req
-                                       returningResponse:&response
-                                                   error:&error];*/
-  // Use the new api for sending requests
-
-
-  // if (error) {
-  //   printf("error: %s\n", [[error description] UTF8String]);
-  //   return nil;
-  // }
-
-  // NSDictionary *plist =
-  //     [NSPropertyListSerialization propertyListWithData:data
-  //                                               options:0
-  //                                                format:NULL
-  //                                                 error:&error];
-  // if (error) {
-  //   printf("error: %s\n", [[error description] UTF8String]);
-  //   return nil;
-  // }
-  return [NSDictionary dictionaryWithContentsOfURL:[NSURL
-                          URLWithString:@"http://static.ess.apple.com/identity/"
-                                        @"validation/cert-1.0.plist"]][@"cert"];
-  //http://static.ess.apple.com/identity/validation/cert-1.0.plist
-  // Return 00
-  //return [NSData dataWithBytes:"00" length:2];
-  //return plist[@"cert"];
+  return [NSDictionary
+      dictionaryWithContentsOfURL:
+          [NSURL URLWithString:@"http://static.ess.apple.com/identity/"
+                               @"validation/cert-1.0.plist"]][@"cert"];
 }
 
 NSData *initialize_validation(NSData *request_bytes) {
@@ -94,92 +60,16 @@ NSData *initialize_validation(NSData *request_bytes) {
   return plist[@"session-info"];
 }
 
-void *load_framework() {
-  void *handle = dlopen(APPLE_SERVICES_FRAMEWORK_PATH, RTLD_LAZY);
-  if (!handle) {
-    printf("dlopen failed: %s\n", dlerror());
-    exit(-1);
-  }
-  return handle;
-}
-
-void *calculate_base(void *handle) {
-#define REF_SYM "IMDAppleIDClientIdentifier"
-#define REF_ADR 0x00000000000d728
-
-  void *real_adr = dlsym(handle, REF_SYM);
-  if (!real_adr) {
-    printf("dlsym failed: %s\n", dlerror());
-    exit(-1);
-  }
-
-  return real_adr - REF_ADR;
-}
-
-void *HANDLE = NULL;
-void *BASE = NULL;
-
-void setup() {
-  if (!HANDLE) {
-    //printf("loading framework\n");
-    NSLog(@"Loading framework...");
-    HANDLE = load_framework();
-    NSLog(@"Framework loaded!");
-    //printf("loaded framework\n");
-  }
-  if (!BASE) {
-    // printf("calculating base\n");
-    BASE = calculate_base(HANDLE);
-    NSLog(@"Calculated base address: %p", BASE);
-  }
-}
-
-int NACInit(const void *cert_bytes, int cert_len, void **validation_ctx,
-            void **request_bytes, int *request_len) {
-#define NACINIT_OFFSET 0xb1db0
-  setup();
-
-  //printf("NACInit called\n");
-  int (*nac_init)(void *, int, void *, void *, void *) = BASE + NACINIT_OFFSET;
-  return nac_init((void *)cert_bytes, cert_len, validation_ctx, request_bytes,
-                  request_len);
-}
-
-int NACSubmitResponse(void *validation_ctx, void *response_bytes,
-                      int response_len) {
-#define NACSUBMITRESPONSE_OFFSET 0xb1dd0
-  setup();
-
-  //printf("NACSubmitResponse called\n");
-  int (*nac_submit_response)(void *, void *, int) =
-      BASE + NACSUBMITRESPONSE_OFFSET;
-  return nac_submit_response(validation_ctx, response_bytes, response_len);
-}
-
-int NACGenerateValidationData(void *validation_ctx, void *unknown_1,
-                              void *unknown_2, void **validation_data,
-                              int *validation_data_len) {
-#define NACGENERATEVALIDATIONDATA_OFFSET 0xb1df0
-  setup();
-
-  //printf("NACGenerateValidationData called\n");
-  int (*nac_generate_validation_data)(void *, void *, void *, void *, int *) =
-      BASE + NACGENERATEVALIDATIONDATA_OFFSET;
-  return nac_generate_validation_data(validation_ctx, unknown_1, unknown_2,
-                                      validation_data, validation_data_len);
-}
-
-
 int main() {
 
   // hello();
-  //CFTypeRef test = IORegistryEntryCreateCFProperty();
+  // CFTypeRef test = IORegistryEntryCreateCFProperty();
   NSLog(@"Sanity checking NACInit...");
   int ret = NACInit(0, 0, 0, 0, 0);
   if (ret != -44023) {
     NSLog(@"NACInit failed sanity check, returned %d", ret);
     exit(-1);
-    //printf("got unexpected result from all-null test: %d\n", ret);
+    // printf("got unexpected result from all-null test: %d\n", ret);
   }
   NSLog(@"NACInit sanity check passed!");
 
@@ -196,7 +86,7 @@ int main() {
   if (ret != 0) {
     NSLog(@"NACInit failed: %d", ret);
     exit(-1);
-    //printf("got unexpected result from valid cert test: %d\n", ret);
+    // printf("got unexpected result from valid cert test: %d\n", ret);
   }
   NSLog(@"Validation context initialized!");
 
@@ -213,24 +103,25 @@ int main() {
 
   // NSData *response = [@"hello" dataUsingEncoding:NSUTF8StringEncoding];
   NSLog(@"Submitting session info...");
-  ret = NACSubmitResponse(validation_ctx, (void *)[session_info bytes],
-                          [session_info length]);
+  ret = NACSubmit(validation_ctx, (void *)[session_info bytes],
+                  [session_info length]);
   if (ret != 0) {
     NSLog(@"NACSubmitResponse failed: %d", ret);
     exit(-1);
-    //printf("got unexpected result from valid response test: %d\n", ret);
+    // printf("got unexpected result from valid response test: %d\n", ret);
   }
   NSLog(@"Session info submitted!");
 
   void *validation_data = NULL;
   int validation_data_len = 0;
   NSLog(@"Generating validation data...");
-  ret = NACGenerateValidationData(validation_ctx, 0, 0, &validation_data,
-                                  &validation_data_len);
+  ret =
+      NACGenerate(validation_ctx, 0, 0, &validation_data, &validation_data_len);
   if (ret != 0) {
     NSLog(@"NACGenerateValidationData failed: %d", ret);
     exit(-1);
-    //printf("got unexpected result from valid validation data test: %d\n", ret);
+    // printf("got unexpected result from valid validation data test: %d\n",
+    // ret);
   }
   NSLog(@"Validation data generated!");
 

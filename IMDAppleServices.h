@@ -1,0 +1,7 @@
+#define IMD_PATH "IMDAppleServices.stubbed"
+#define IMD_REF_SYM "IMDAppleIDClientIdentifier"
+#define IMD_REF_ADDR 0x0000D728
+
+#define IMD_NACINIT_ADDR 0x000B1DB0
+#define IMD_NACSUBMIT_ADDR 0x000B1DD0
+#define IMD_NACGENERATE_ADDR 0x000B1DF0
