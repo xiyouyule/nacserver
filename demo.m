@@ -41,8 +41,11 @@ NSData *request_cert() {
   //   return nil;
   // }
   return [NSDictionary dictionaryWithContentsOfURL:[NSURL
-                         URLWithString:@"http://static.ess.apple.com/identity/"
-                                       @"validation/cert-1.0.plist"]][@"cert"];
+                          URLWithString:@"http://static.ess.apple.com/identity/"
+                                        @"validation/cert-1.0.plist"]][@"cert"];
+  //http://static.ess.apple.com/identity/validation/cert-1.0.plist
+  // Return 00
+  //return [NSData dataWithBytes:"00" length:2];
   //return plist[@"cert"];
 }
 
@@ -182,7 +185,7 @@ int main() {
 
   NSLog(@"Requesting cert...");
   NSData *certData = request_cert();
-  NSLog(@"Got cert!");
+  NSLog(@"Got cert! %@", certData);
 
   NSLog(@"Initializing validation context...");
   void *validation_ctx = NULL;

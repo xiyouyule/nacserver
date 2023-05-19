@@ -1,15 +1,13 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <Foundation/NSData.h>
 #include <Foundation/NSDictionary.h>
+#include <Foundation/NSException.h>
 #include <Foundation/NSPropertyList.h>
 #include <Foundation/NSString.h>
-#include <Foundation/NSException.h>
 #include <IOKit/IOTypes.h>
 #include <stdio.h>
 
-//#define DEBUG 1
-
-#ifdef DEBUG
+#if DEBUG == 1
 #define NSLog(...) NSLog(@"[viokit] " __VA_ARGS__)
 #else
 #define NSLog(...)
@@ -25,12 +23,12 @@ NSDictionary *read_data_plist() {
   NSString *path = @"data.plist";
   NSData *data = [NSData dataWithContentsOfFile:path];
   if (!data) {
-    //printf("Failed to read data.plist\n");
-    //exit(-2);
+    // printf("Failed to read data.plist\n");
+    // exit(-2);
     @throw [NSException exceptionWithName:@"Failed to read data.plist"
                                    reason:@"Failed to read data.plist"
                                  userInfo:nil];
-    //return nil;
+    // return nil;
   }
   NSError *error;
   NSDictionary *plist =
@@ -39,9 +37,9 @@ NSDictionary *read_data_plist() {
                                                  format:NULL
                                                   error:&error];
   if (error) {
-    //printf("Failed to parse data.plist oh no\n");
-    //exit(-2);
-    // Throw an exception
+    // printf("Failed to parse data.plist oh no\n");
+    // exit(-2);
+    //  Throw an exception
     @throw [NSException exceptionWithName:@"Failed to parse data.plist"
                                    reason:@"Failed to parse data.plist"
                                  userInfo:nil];
@@ -76,7 +74,7 @@ mach_port_t kIOMasterPortDefault = 90;
 io_registry_entry_t IORegistryEntryFromPath(mach_port_t masterPort,
                                             char *path) {
   NSLog(@"IORegistryEntryFromPath called with port %d path: %s\n", masterPort,
-         path);
+        path);
   return 91;
 }
 
@@ -88,7 +86,7 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
   char key_c[100];
   CFStringGetCString(key, key_c, 100, kCFStringEncodingUTF8);
   NSLog(@"IORegistryEntryCreateCFProperty called with entry: %d key: %s\n",
-         entry, key_c);
+        entry, key_c);
 
   NSDictionary *data_plist = get_iokit_data();
   // Convert the CFStringRef to a NSString
@@ -101,13 +99,13 @@ CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry,
     NSLog(@"Returning value: %@", value);
     // Check if it is a string
     if ([value isKindOfClass:[NSString class]]) {
-      //printf("value is NSString\n");
-      // Convert the NSString to a CFStringRef
+      // printf("value is NSString\n");
+      //  Convert the NSString to a CFStringRef
       CFStringRef value_cf = (__bridge_retained CFStringRef)value;
       return value_cf;
     } else if ([value isKindOfClass:[NSData class]]) {
-      //printf("value is NSData\n");
-      // Convert the NSData to a CFDataRef
+      // printf("value is NSData\n");
+      //  Convert the NSData to a CFDataRef
       CFDataRef value_cf = (__bridge_retained CFDataRef)value;
       // Make a copy of the CFDataRef so that we are not returning an ARC object
       CFDataRef value_cf_copy = CFDataCreateCopy(NULL, value_cf);
@@ -159,9 +157,9 @@ bool ITER_93_SHOULD_RETURN_MAC = false;
 kern_return_t IOServiceGetMatchingServices(mach_port_t masterPort,
                                            CFDictionaryRef matching,
                                            io_iterator_t *existing) {
-  //printf("IOServiceGetMatchingServices called with port: %d matching: \n",
-  //       masterPort);
-  //CFShow(matching);
+  // printf("IOServiceGetMatchingServices called with port: %d matching: \n",
+  //        masterPort);
+  // CFShow(matching);
   if (CFSTR_CMP(CFDictionaryGetValue(matching, CFSTR("IOProviderClass")),
                 CFSTR("IOEthernetInterface"))) {
     // printf("IOServiceGetMatchingServices returning 0\n");
@@ -175,7 +173,7 @@ kern_return_t IOServiceGetMatchingServices(mach_port_t masterPort,
 }
 
 io_object_t IOIteratorNext(io_iterator_t iterator) {
-  //NSLog("IOIteratorNext\n");
+  // NSLog("IOIteratorNext\n");
   if (iterator == 93 && ITER_93_SHOULD_RETURN_MAC) {
     NSLog(@"IOIteratorNext returning 'item'");
     ITER_93_SHOULD_RETURN_MAC = false;
@@ -185,13 +183,15 @@ io_object_t IOIteratorNext(io_iterator_t iterator) {
   return 0;
 }
 
-void IOObjectRelease(io_object_t object) { /*printf("IOObjectRelease\n");*/ } // We don't care about memory managing our 'objects' lol
+void IOObjectRelease(io_object_t object) { /*printf("IOObjectRelease\n");*/
+} // We don't care about memory managing our 'objects' lol
 
 kern_return_t IORegistryEntryGetParentEntry(io_registry_entry_t entry,
                                             const io_name_t plane,
                                             io_registry_entry_t *parent) {
-  NSLog(@"IORegistryEntryGetParentEntry called with entry: %d returning entry + 100",
-         entry);
+  NSLog(@"IORegistryEntryGetParentEntry called with entry: %d returning entry "
+        @"+ 100",
+        entry);
   // Set parent to entry + 100
   *parent = entry + 100;
   // printf("IORegistryEntryGetParentEntry returning 0\n");
@@ -214,8 +214,8 @@ CFNumberRef DASessionCreate(void *alloc) {
   // return 201;
 }
 
-CFNumberRef DADiskCreateFromBSDName(CFAllocatorRef allocator, CFNumberRef session,
-                                    const char *name) {
+CFNumberRef DADiskCreateFromBSDName(CFAllocatorRef allocator,
+                                    CFNumberRef session, const char *name) {
   NSLog(@"DADiskCreateFromBSDName session: %@ name: %s", session, name);
   // return 202;
   int value = 202;
@@ -230,27 +230,77 @@ CFDictionaryRef DADiskCopyDescription(CFNumberRef disk) {
   CFMutableDictionaryRef dict =
       CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks,
                                 &kCFTypeDictionaryValueCallBacks);
-  //printf("dict: %p\n", dict);
-  // Add the UUID to the dictionary
-  // Load the UUID from data.plist
+  // printf("dict: %p\n", dict);
+  //  Add the UUID to the dictionary
+  //  Load the UUID from data.plist
   NSDictionary *data_plist = read_data_plist();
-  //printf("data_plist: %p\n", data_plist);
-  // Get root_disk_uuid
+  // printf("data_plist: %p\n", data_plist);
+  //  Get root_disk_uuid
   NSString *root_disk_uuid = [data_plist objectForKey:@"root_disk_uuid"];
   // Convert the NSString to a CFStringRef
   CFStringRef root_disk_uuid_cf = (__bridge_retained CFStringRef)root_disk_uuid;
   // Convert it to a CFUUIDRef
   CFUUIDRef root_disk_uuid_cfuuid =
       CFUUIDCreateFromString(NULL, root_disk_uuid_cf);
-  //printf("root_disk_uuid_cf: %p\n", root_disk_uuid_cf);
-  // Add the UUID to the dictionary
+  // printf("root_disk_uuid_cf: %p\n", root_disk_uuid_cf);
+  //  Add the UUID to the dictionary
   CFDictionaryAddValue(dict, kDADiskDescriptionVolumeUUIDKey,
                        root_disk_uuid_cfuuid);
-  //printf("dict: %p\n", dict);
-  // Make a copy of the CFDictionaryRef so that we are not returning an ARC
-  // object
-  //CFDictionaryRef dict_copy = CFDictionaryCreateCopy(NULL, dict);
-  //printf("dict_copy: %p\n", dict_copy);
-  // Return the dictionary
+  // printf("dict: %p\n", dict);
+  //  Make a copy of the CFDictionaryRef so that we are not returning an ARC
+  //  object
+  // CFDictionaryRef dict_copy = CFDictionaryCreateCopy(NULL, dict);
+  // printf("dict_copy: %p\n", dict_copy);
+  //  Return the dictionary
   return dict;
 }
+
+#if SYSCTLHOOK == 1
+
+#import "fishhook.h"
+#import <sys/sysctl.h>
+
+static int (*sysctlbyname_orig)(const char *name, void *oldp, size_t *oldlenp,
+                                void *newp, size_t newlen);
+
+int sysctlbyname_hook(const char *name, void *oldp, size_t *oldlenp, void *newp,
+                      size_t newlen) {
+  NSLog(@"sysctlbyname_hook called with name: %s", name);
+  // If it's kern.osversion
+  if (strcmp(name, "kern.osversion")) {
+    // Write string 22E261 to oldp
+    *oldlenp = 6;
+    if (oldp != NULL) {
+      strcpy(oldp, "22E261");
+    }
+
+    // Return 0
+    return 0;
+  } else if (strcmp(name, "kern.osrevision")) {
+    // Write number 199506 to oldp
+    *oldlenp = 4;
+    if (oldp != NULL) {
+      unsigned long n = 199506;
+
+      ((unsigned char *)oldp)[0] = (n >> 24) & 0xFF;
+      ((unsigned char *)oldp)[1] = (n >> 16) & 0xFF;
+      ((unsigned char *)oldp)[2] = (n >> 8) & 0xFF;
+      ((unsigned char *)oldp)[3] = n & 0xFF;
+    }
+
+    return 0;
+  }
+
+  return ENOENT;
+}
+
+// Run when dylib is loaded init function
+__attribute__((constructor)) static void init() {
+  NSLog(@"Hooking sysctlbyname using fishhook...");
+  // Hook sysctlbyname
+  rebind_symbols((struct rebinding[1]){{"sysctlbyname", sysctlbyname_hook,
+                                        (void *)&sysctlbyname_orig}},
+                 1);
+}
+
+#endif
