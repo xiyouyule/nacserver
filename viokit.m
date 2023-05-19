@@ -7,7 +7,7 @@
 #include <IOKit/IOTypes.h>
 #include <stdio.h>
 
-//#define DEBUG 1
+#define DEBUG
 
 #ifdef DEBUG
 #define NSLog(...) NSLog(@"[viokit] " __VA_ARGS__)
