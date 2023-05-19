@@ -178,6 +178,7 @@ int main() {
     exit(-1);
     //printf("got unexpected result from all-null test: %d\n", ret);
   }
+  NSLog(@"NACInit sanity check passed!");
 
   NSLog(@"Requesting cert...");
   NSData *certData = request_cert();
