@@ -13,7 +13,7 @@ xcrun clang -shared viokit.o -o VIOKit -framework Foundation -arch x86_64
 # Remove the viokit.o file
 rm viokit.o
 
-# Compile test.m into an executable
-xcrun clang demo.m -o demo -framework Foundation -framework IOKit -arch x86_64  -fobjc-arc
+# Compile test.m into an executable, don't warn about depracated functions
+xcrun clang demo.m -o demo -framework Foundation -framework IOKit -arch x86_64  -fobjc-arc -Wno-deprecated-declarations
 # Run the executable
 ./demo
