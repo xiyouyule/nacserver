@@ -12,33 +12,38 @@
 NSData *request_cert() {
   // Make a request to
   // http://static.ess.apple.com/identity/validation/cert-1.0.plist
-  NSMutableURLRequest *req = [NSMutableURLRequest
-      requestWithURL:[NSURL
-                         URLWithString:@"http://static.ess.apple.com/identity/"
-                                       @"validation/cert-1.0.plist"]];
-  [req setHTTPMethod:@"GET"];
+  // NSMutableURLRequest *req = [NSMutableURLRequest
+  //     requestWithURL:[NSURL
+  //                        URLWithString:@"http://static.ess.apple.com/identity/"
+  //                                      @"validation/cert-1.0.plist"]];
+  // [req setHTTPMethod:@"GET"];
 
-  NSURLResponse *response = nil;
-  NSError *error = nil;
-  NSData *data = [NSURLConnection sendSynchronousRequest:req
+  // NSURLResponse *response = nil;
+  // NSError *error = nil;
+  /*NSData *data = [NSURLConnection sendSynchronousRequest:req
                                        returningResponse:&response
-                                                   error:&error];
+                                                   error:&error];*/
+  // Use the new api for sending requests
 
-  if (error) {
-    printf("error: %s\n", [[error description] UTF8String]);
-    return nil;
-  }
 
-  NSDictionary *plist =
-      [NSPropertyListSerialization propertyListWithData:data
-                                                options:0
-                                                 format:NULL
-                                                  error:&error];
-  if (error) {
-    printf("error: %s\n", [[error description] UTF8String]);
-    return nil;
-  }
-  return plist[@"cert"];
+  // if (error) {
+  //   printf("error: %s\n", [[error description] UTF8String]);
+  //   return nil;
+  // }
+
+  // NSDictionary *plist =
+  //     [NSPropertyListSerialization propertyListWithData:data
+  //                                               options:0
+  //                                                format:NULL
+  //                                                 error:&error];
+  // if (error) {
+  //   printf("error: %s\n", [[error description] UTF8String]);
+  //   return nil;
+  // }
+  return [NSDictionary dictionaryWithContentsOfURL:[NSURL
+                         URLWithString:@"http://static.ess.apple.com/identity/"
+                                       @"validation/cert-1.0.plist"]][@"cert"];
+  //return plist[@"cert"];
 }
 
 NSData *initialize_validation(NSData *request_bytes) {
