@@ -77,7 +77,24 @@ def get_session_info(req: bytes) -> bytes:
     resp = plistlib.loads(resp.content)
     return resp["session-info"]
 
+def build():
+    # Get data.plist ?
+    # check if data.plist exists
+    # if not, download it
+    import os
+    if not os.path.exists("data.plist"):
+        print("DID NOT FIND data.plist")
+        print("You can ask @JJTech for a testing one")
+        print("Or, if this is macOS on a non-m1 machine, you can try to run build_extractor.sh to generate it")
+    # Run stubber
+    subprocess.run(["python3", "stubber.py"])
+    # Compile
+    subprocess.run(["bash", "build.sh"])
+
 if __name__ == "__main__":
+    print("Building...")
+    build()
+    print("Done building")
     server = NACServer()
     server.load() # Technically unnecessary because init will load if not loaded
     req = server.init(get_cert())

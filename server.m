@@ -27,7 +27,16 @@ NSDictionary *handle_command(NSDictionary *cmd) {
   // Check if the command is "load"
   if ([command isEqualToString:@"load"]) {
     // Load the IMDAppleServices framework
-    NACLoad();
+    @try {
+      NACLoad();
+    } @catch (NSException *e) {
+      NSLog(@"NACLoad threw exception: %@", e);
+      return @{
+        @"status" : @"error",
+        @"error": @"nacload_threw",
+        @"description" : [NSString stringWithFormat:@"NACLoad threw exception: %@", e],
+      };
+    }
     return @{
       @"status" : @"ok",
     };
@@ -47,8 +56,19 @@ NSDictionary *handle_command(NSDictionary *cmd) {
     void *validation_ctx = NULL;
     void *request_bytes = NULL;
     int request_len = 0;
-    int ret = NACInit([cert_data bytes], [cert_data length], &validation_ctx,
+    int ret;
+    @try {
+    ret = NACInit([cert_data bytes], [cert_data length], &validation_ctx,
                       &request_bytes, &request_len);
+    } @catch (NSException *e) {
+      NSLog(@"NACInit threw exception: %@", e);
+      return @{
+        @"status" : @"error",
+        @"error": @"nacinit_threw",
+        @"description" : [NSString stringWithFormat:@"NACInit threw exception: %@", e],
+      };
+    }
+
     if (ret != 0) {
       NSLog(@"NACInit failed: %d", ret);
       return @{
@@ -96,7 +116,17 @@ NSDictionary *handle_command(NSDictionary *cmd) {
 
     NSLog(@"Submitting response: %@ with context %p", resp_data, validation_ctx);
 
-    int ret = NACSubmit(validation_ctx, (void*)[resp_data bytes], [resp_data length]);
+    int ret;
+    @try {
+      ret = NACSubmit(validation_ctx, (void*)[resp_data bytes], [resp_data length]);
+    } @catch (NSException *e) {
+      NSLog(@"NACSubmit threw exception: %@", e);
+      return @{
+        @"status" : @"error",
+        @"error": @"nacsubmit_threw",
+        @"description" : [NSString stringWithFormat:@"NACSubmit threw exception: %@", e],
+      };
+    }
 
     if (ret != 0) {
       NSLog(@"NACSubmit failed: %d", ret);
@@ -131,7 +161,17 @@ NSDictionary *handle_command(NSDictionary *cmd) {
     // Generate the validation data
     void *validation_data = NULL;
     int validation_data_len = 0;
-    int ret = NACGenerate(validation_ctx, 0, 0, &validation_data, &validation_data_len);
+    int ret;
+    @try {
+      ret = NACGenerate(validation_ctx, 0, 0, &validation_data, &validation_data_len);
+    } @catch (NSException *e) {
+      NSLog(@"NACGenerate threw exception: %@", e);
+      return @{
+        @"status" : @"error",
+        @"error": @"nacgenerate_threw",
+        @"description" : [NSString stringWithFormat:@"NACGenerate threw exception: %@", e],
+      };
+    }
     if (ret != 0) {
       NSLog(@"NACGenerate failed: %d", ret);
       return @{
