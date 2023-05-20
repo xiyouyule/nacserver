@@ -8,6 +8,7 @@
 #import <IOKit/IOKitLib.h>
 
 // Requests the validation certificate chain from Apple
+// http://static.ess.apple.com/identity/validation/cert-1.0.plist
 NSData *request_cert() {
   return [NSDictionary
       dictionaryWithContentsOfURL:

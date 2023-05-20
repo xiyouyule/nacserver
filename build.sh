@@ -17,6 +17,9 @@ xcrun clang -shared viokit.o -o VIOKit -framework Foundation -arch x86_64
 rm viokit.o
 
 # Compile test.m into an executable, don't warn about depracated functions
-xcrun clang demo.m -o demo -framework Foundation -framework IOKit -arch x86_64  -fobjc-arc -Wno-deprecated-declarations
+#xcrun clang demo.m -o demo -framework Foundation -framework IOKit -arch x86_64  -fobjc-arc -Wno-deprecated-declarations
 # Run the executable
-./demo
+#./demo
+
+xcrun clang server.m -o server -framework Foundation -arch x86_64  -fobjc-arc -Wno-deprecated-declarations
+#./server
